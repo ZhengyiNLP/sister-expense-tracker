@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小钱袋 - 登录/注册</title>
+  <!-- 引入外部资源 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF6B8B',
+            income: '#90EE90',
+            expense: '#FFA07A',
+            neutral: '#F8F9FA',
+            dark: '#343A40',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .btn-hover {
+        transition: all 0.3s ease;
+      }
+      .btn-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(255, 107, 139, 0.2);
+      }
+    }
+  </style>
+  
+  <style>
+    /* 全局样式 */
+    body {
+      background-color: #FAFAFC;
+    }
+    
+    /* 动画效果 */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* 滚动条美化 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background-color: #FF6B8B;
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background-color: #F1F1F1;
+    }
+  </style>
+  <!-- 引入服务器配置 -->
+  <script src="config.js"></script>
+</head>
+<body class="font-sans text-dark min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-md p-6">
+    <!-- Logo和标题 -->
+    <div class="text-center mb-8 fade-in">
+      <div class="inline-flex items-center justify-center w-20 h-20 bg-primary/20 rounded-full mb-4">
+        <i class="fa fa-piggy-bank text-primary text-3xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-primary">小钱袋</h1>
+      <p class="text-gray-600 mt-2">个人收支记录管理</p>
+    </div>
+    
+    <!-- 登录表单 -->
+    <div id="loginForm" class="bg-white rounded-xl p-6 card-shadow fade-in">
+      <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">登录账户</h2>
+      
+      <form id="loginFormElement">
+        <div class="mb-4">
+          <label for="loginUsername" class="block text-gray-700 text-sm font-medium mb-2">
+            邮箱
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+              <i class="fa fa-envelope text-gray-400"></i>
+            </span>
+            <input 
+              type="email" 
+              id="loginUsername" 
+              name="username"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+              placeholder="请输入邮箱"
+              required
+            >
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <label for="loginPassword" class="block text-gray-700 text-sm font-medium mb-2">
+            密码
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+              <i class="fa fa-lock text-gray-400"></i>
+            </span>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              name="password"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+              placeholder="请输入密码"
+              required
+            >
+          </div>
+        </div>
+        
+        <button 
+          type="submit" 
+          class="w-full bg-primary text-white font-medium py-2 px-4 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 transition-colors btn-hover"
+        >
+          登录
+        </button>
+      </form>
+      
+      <div class="mt-4 text-center">
+        <p class="text-gray-600">
+          还没有账户？
+          <button id="showRegisterBtn" class="text-primary hover:underline font-medium">
+            立即注册
+          </button>
+        </p>
+        <p class="text-gray-600 mt-2">
+          <button id="showForgotPasswordBtn" class="text-primary hover:underline font-medium">
+            忘记密码？
+          </button>
+        </p>
+      </div>
+    </div>
+    
+    <!-- 注册表单 -->
+    <div id="registerForm" class="bg-white rounded-xl p-6 card-shadow fade-in hidden">
+      <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">注册新账户</h2>
+      
+      <form id="registerFormElement">
+        <div class="mb-4">
+          <label for="registerUsername" class="block text-gray-700 text-sm font-medium mb-2">
+            用户名
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+              <i class="fa fa-user text-gray-400"></i>
+            </span>
+            <input 
+              type="text" 
+              id="registerUsername" 
+              name="username"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+              placeholder="请输入用户名"
+              required
+            >
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="registerEmail" class="block text-gray-700 text-sm font-medium mb-2">
+            邮箱
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+              <i class="fa fa-envelope text-gray-400"></i>
+            </span>
+            <input 
+              type="email" 
+              id="registerEmail" 
+              name="email"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+              placeholder="请输入邮箱"
+              required
+            >
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="registerPassword" class="block text-gray-700 text-sm font-medium mb-2">
+            密码
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+              <i class="fa fa-lock text-gray-400"></i>
+            </span>
+            <input 
+              type="password" 
+              id="registerPassword" 
+              name="password"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+              placeholder="请输入密码（至少6位）"
+              minlength="6"
+              required
+            >
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <label for="confirmPassword" class="block text-gray-700 text-sm font-medium mb-2">
+            确认密码
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+              <i class="fa fa-lock text-gray-400"></i>
+            </span>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+              placeholder="请再次输入密码"
+              required
+            >
+          </div>
+        </div>
+        
+        <button 
+          type="submit" 
+          class="w-full bg-primary text-white font-medium py-2 px-4 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 transition-colors btn-hover"
+        >
+          注册
+        </button>
+      </form>
+      
+      <div class="mt-6 text-center">
+        <p class="text-gray-600">
+          已有账户？
+          <button id="showLoginBtn" class="text-primary hover:underline font-medium">
+            立即登录
+          </button>
+        </p>
+      </div>
+    </div>
+    
+    <!-- 找回密码表单 -->
+    <div id="forgotPasswordForm" class="bg-white rounded-xl p-6 card-shadow fade-in hidden">
+      <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">找回密码</h2>
+      
+      <form id="forgotPasswordFormElement">
+        <div class="mb-4">
+          <label for="forgotEmail" class="block text-gray-700 text-sm font-medium mb-2">
+            注册邮箱
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+              <i class="fa fa-envelope text-gray-400"></i>
+            </span>
+            <input 
+              type="email" 
+              id="forgotEmail" 
+              name="email"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+              placeholder="请输入注册时使用的邮箱"
+              required
+            >
+          </div>
+        </div>
+        
+        <button 
+          type="submit" 
+          class="w-full bg-primary text-white font-medium py-2 px-4 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 transition-colors btn-hover"
+        >
+          发送重置链接
+        </button>
+      </form>
+      
+      <div class="mt-6 text-center">
+        <p class="text-gray-600">
+          <button id="showLoginFromForgotBtn" class="text-primary hover:underline font-medium">
+            返回登录
+          </button>
+        </p>
+      </div>
+    </div>
+    
+    <!-- 提示消息 -->
+    <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg hidden z-50">
+      <span id="toastMessage"></span>
+    </div>
+  </div>
+
+  <script>
+    // DOM元素
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    const loginFormElement = document.getElementById('loginFormElement');
+    const registerFormElement = document.getElementById('registerFormElement');
+    const forgotPasswordFormElement = document.getElementById('forgotPasswordFormElement');
+    const showRegisterBtn = document.getElementById('showRegisterBtn');
+    const showLoginBtn = document.getElementById('showLoginBtn');
+    const showForgotPasswordBtn = document.getElementById('showForgotPasswordBtn');
+    const showLoginFromForgotBtn = document.getElementById('showLoginFromForgotBtn');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    // 显示提示消息
+    function showToast(message, duration = 3000) {
+      toastMessage.textContent = message;
+      toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, duration);
+    }
+    
+    // 显示注册表单
+    showRegisterBtn.addEventListener('click', () => {
+      loginForm.classList.add('hidden');
+      registerForm.classList.remove('hidden');
+      forgotPasswordForm.classList.add('hidden');
+    });
+    
+    // 显示登录表单
+    showLoginBtn.addEventListener('click', () => {
+      registerForm.classList.add('hidden');
+      forgotPasswordForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+    });
+    
+    // 显示找回密码表单
+    showForgotPasswordBtn.addEventListener('click', () => {
+      loginForm.classList.add('hidden');
+      registerForm.classList.add('hidden');
+      forgotPasswordForm.classList.remove('hidden');
+    });
+    
+    // 从找回密码表单返回登录
+    showLoginFromForgotBtn.addEventListener('click', () => {
+      forgotPasswordForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+    });
+    
+    // 登录表单提交
+    loginFormElement.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(loginFormElement);
+      const email = formData.get('username'); // 使用username输入框的值作为email
+      const password = formData.get('password');
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          // 保存token和用户信息到localStorage
+          localStorage.setItem('authToken', data.data.token);
+          localStorage.setItem('currentUser', JSON.stringify(data.data.user));
+          
+          showToast('登录成功，正在跳转...');
+          
+          // 跳转到主页面
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1000);
+        } else {
+          showToast(data.message || '登录失败');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showToast('登录失败，请检查网络连接');
+      }
+    });
+    
+    // 注册表单提交
+    registerFormElement.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(registerFormElement);
+      const name = formData.get('username'); // 使用username输入框的值作为name
+      const email = formData.get('email');
+      const password = formData.get('password');
+      const confirmPassword = formData.get('confirmPassword');
+      
+      // 验证密码
+      if (password !== confirmPassword) {
+        showToast('两次输入的密码不一致');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          showToast('注册成功，请登录');
+          
+          // 切换到登录表单
+          registerForm.classList.add('hidden');
+          loginForm.classList.remove('hidden');
+          
+          // 清空注册表单
+          registerFormElement.reset();
+        } else {
+          showToast(data.message || '注册失败');
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        showToast('注册失败，请检查网络连接');
+      }
+    });
+    
+    // 找回密码表单提交
+    forgotPasswordFormElement.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(forgotPasswordFormElement);
+      const email = formData.get('email');
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          showToast('重置链接已发送到您的邮箱');
+          
+          // 切换到登录表单
+          forgotPasswordForm.classList.add('hidden');
+          loginForm.classList.remove('hidden');
+          
+          // 清空找回密码表单
+          forgotPasswordFormElement.reset();
+        } else {
+          showToast(data.message || '发送失败');
+        }
+      } catch (error) {
+        console.error('Forgot password error:', error);
+        showToast('发送失败，请检查网络连接');
+      }
+    });
+    
+    // 检查是否已登录
+    window.addEventListener('load', () => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        // 如果已登录，直接跳转到主页面
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>

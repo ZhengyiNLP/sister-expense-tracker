@@ -1,0 +1,22 @@
+{
+  "name": "sister-expense-tracker-backend",
+  "version": "1.0.0",
+  "description": "Backend for sister expense tracker",
+  "main": "server-auth.js",
+  "scripts": {
+    "start": "node server-auth.js",
+    "dev": "nodemon server-auth.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
